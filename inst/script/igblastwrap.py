@@ -969,7 +969,7 @@ def run_igblastwrap(
                     n += 1
 
             # Just for logging progress
-            if n % 1000 == 0:
+            if n > 0 and n % 1000 == 0:
                 elapsed = time.time() - start_time
                 if elapsed >= last_status_update + 60:
                     logger.info(
@@ -981,9 +981,14 @@ def run_igblastwrap(
 
     # Done reading all chunks
     elapsed = time.time() - start_time
-    logger.info(
-        "Processed {:10,d} sequences at {:.1f} ms/sequence".format(n, elapsed / n * 1e3)
-    )
+    if n > 0:
+        logger.info(
+            "Processed {:10,d} sequences at {:.1f} ms/sequence".format(
+                n, elapsed / n * 1e3
+            )
+        )
+    else:
+        logger.info("Processed 0 sequences in {:.1f} s".format(elapsed))
 
 
 if __name__ == "__main__":

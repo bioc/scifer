@@ -91,14 +91,34 @@ igblast <- function(database, fasta, threads = 1) {
   }
   
   # Parse output to data.frame
+  # Locate the AIRR header line. If igblast/makeblastdb failed to run, `res`
+  # holds the error/traceback instead of a table and no header is present.
+  header_line <- grep("^sequence_id", res)
+  if (length(header_line) == 0) {
+    message(
+      "Failed to parse igblast output: no AIRR header (\"sequence_id\") found. ",
+      "This usually means igblast/makeblastdb could not run in this ",
+      "environment. Captured output:\n",
+      paste(res, collapse = "\n")
+    )
+    return(NULL)
+  }
+  header_line <- header_line[1]
+
   df <- tryCatch({
-    header_line <- grep("^sequence_id", res)
-    txt <- paste(res[header_line:length(res)][res[header_line:length(res)] != ""], collapse = "\n")
-    read.table(text = txt, header = TRUE, sep = "\t", stringsAsFactors = FALSE)
+    lines <- res[header_line:length(res)]
+    lines <- lines[lines != ""]
+    read.table(
+      text = paste(lines, collapse = "\n"),
+      header = TRUE, sep = "\t", stringsAsFactors = FALSE
+    )
   }, error = function(e) {
-    message("Failed to parse igblast output: ", e$message)
+    message(
+      "Failed to parse igblast output: ", e$message,
+      "\nCaptured output:\n", paste(res, collapse = "\n")
+    )
     NULL
   })
-  
+
   return(df)
 }

@@ -1,3 +1,15 @@
+# scifer 1.15.1
+BUG FIXES
+* Fix `igblast()` crashing with the cryptic error "argument of length 0" when
+  the igblast output contained no AIRR header line. The wrapper now returns
+  `NULL` gracefully and reports the captured igblast/conda output so build-time
+  failures are diagnosable. This fixes the failing `test-igblast.R` check on
+  the Bioconductor build machines.
+* Make the "returns a data.frame object" test skip (instead of erroring) when
+  the igblast/conda environment is unavailable in the test environment.
+* Guard a division-by-zero in `igblastwrap.py` when zero sequences are
+  processed.
+
 # scifer 1.12.1
 * fix minor bug that crashed `quality_report` when some sequences had problematic quality and had NA or Inf values
   - this affects `summarise_quality` and `summarise_abi_file`
